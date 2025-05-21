@@ -1,5 +1,5 @@
 import React from 'react';
-import suburbs from './data/suburbs.json';
+import suburbs from './Suburbs.json';
 import Calculator from './Calculator';
 import { Toaster } from 'react-hot-toast';
 
