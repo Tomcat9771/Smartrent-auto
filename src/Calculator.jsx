@@ -3,7 +3,6 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import toast, { Toaster } from 'react-hot-toast';
 import { Combobox } from '@headlessui/react';
-import suburbs from './Suburbs.json';
 
 const MAX_ENTRIES = 10;
 const EXPIRY_DAYS = 7;
@@ -21,12 +20,28 @@ const Calculator = () => {
     upfrontCost: 0,
     monthlyInstallment: 0,
   });
+  const [suburbs, setSuburbs] = useState([]);
   const [filteredSuburbs, setFilteredSuburbs] = useState([]);
   const [selectedSuburbInfo, setSelectedSuburbInfo] = useState(null);
   const [history, setHistory] = useState([]);
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [loadingCalc, setLoadingCalc] = useState(false);
 
+  // Load suburb data dynamically
+  useEffect(() => {
+    fetch('/Suburbs.json')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch suburbs');
+        return res.json();
+      })
+      .then((data) => setSuburbs(data))
+      .catch((err) => {
+        console.error(err);
+        toast.error('Could not load suburb data');
+      });
+  }, []);
+
+  // Load history from localStorage
   useEffect(() => {
     const now = new Date();
     const history = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
