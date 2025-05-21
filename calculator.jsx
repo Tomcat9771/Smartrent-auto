@@ -3,7 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import toast, { Toaster } from 'react-hot-toast';
 import { Combobox } from '@headlessui/react';
-import suburbs from './data/suburbs.json';
+import suburbs from './Suburbs.json';
 
 const MAX_ENTRIES = 10;
 const EXPIRY_DAYS = 7;
