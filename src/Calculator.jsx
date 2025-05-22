@@ -45,19 +45,12 @@ const Calculator = ({ suburbs }) => {
     setInputs(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSuburbInputChange = (value) => {
+ const handleSuburbInputChange = (value) => {
   setInputs(prev => ({ ...prev, suburb: value }));
-
-  if (!value.trim()) {
-    setFilteredSuburbs([]);
-    setSelectedSuburbInfo(null);
-    return;
-  }
-
+  setSelectedSuburbInfo(null);
   const filtered = suburbs.filter(sub =>
     sub.Suburb.toLowerCase().includes(value.toLowerCase())
   ).slice(0, 10);
-
   setFilteredSuburbs(filtered);
 };
 
