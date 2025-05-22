@@ -123,7 +123,7 @@ const Calculator = ({ suburbs }) => {
           ['Vehicle Price', `R${inputs.vehiclePrice}`],
           ['M&M Value', `R${inputs.mmValue}`],
           ['Suburb', inputs.suburb],
-          ['Town', selectedSuburbInfo?.MN_NAME || ''],
+          ['Town', selectedSuburbInfo?.MP_NAME || ''],
           ['Municipality', selectedSuburbInfo?.DC_NAME || ''],
           ['Province', selectedSuburbInfo?.Province || ''],
           ['Distance (km)', selectedSuburbInfo?.DIST_KM || ''],
@@ -183,7 +183,7 @@ const Calculator = ({ suburbs }) => {
         <Combobox.Options className="border rounded shadow bg-white max-h-60 overflow-y-auto">
           {filteredSuburbs.map((suburb, idx) => (
             <Combobox.Option key={idx} value={suburb}>
-              {suburb.SP_NAME} ({suburb.MN_NAME})
+              {suburb.SP_NAME} ({suburb.MP_NAME})
             </Combobox.Option>
           ))}
         </Combobox.Options>
@@ -191,7 +191,7 @@ const Calculator = ({ suburbs }) => {
 
       {selectedSuburbInfo && (
         <div className="text-sm text-gray-700 mb-4">
-          <p><strong>Town:</strong> {selectedSuburbInfo.MN_NAME}</p>
+          <p><strong>Town:</strong> {selectedSuburbInfo.MP_NAME}</p>
           <p><strong>Municipality:</strong> {selectedSuburbInfo.DC_NAME}</p>
           <p><strong>Province:</strong> {selectedSuburbInfo.Province}</p>
           <p><strong>Distance (km):</strong> {selectedSuburbInfo.DIST_KM}</p>
