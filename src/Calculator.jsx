@@ -69,7 +69,6 @@ const Calculator = ({ suburbs }) => {
     setFilteredSuburbs([]);
   };
 
-
   const saveSubmissionToLocalStorage = (submission) => {
     const now = new Date();
     const timestampedSubmission = { ...submission, timestamp: now.toISOString() };
@@ -156,7 +155,11 @@ const Calculator = ({ suburbs }) => {
   return (
     <div className="p-4 max-w-xl mx-auto">
       <Toaster />
-      <h1 className="text-3xl font-bold mb-6 text-center">SmartRent Auto™ Calculator</h1>
+      <div className="flex items-center mb-6 bg-white p-2 rounded shadow">
+  <img src="/logo.jpg" alt="SmartRent Auto Logo" className="h-10 w-auto mr-3" />
+  <h1 className="text-2xl font-bold text-gray-800">SmartRent Auto™ Calculator</h1>
+</div>
+
 
       <input
         type="text"
@@ -274,6 +277,7 @@ const Calculator = ({ suburbs }) => {
 };
 
 export default Calculator;
+
 
 
 
