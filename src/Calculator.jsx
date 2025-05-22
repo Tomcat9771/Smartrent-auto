@@ -7,8 +7,9 @@ import { Combobox } from '@headlessui/react';
 const MAX_ENTRIES = 10;
 const EXPIRY_DAYS = 7;
 
-const Calculator = () => {
+const Calculator = ({ suburbs }) => {
   const [inputs, setInputs] = useState({
+    clientName: '',
     vehiclePrice: '',
     mmValue: '',
     suburb: '',
@@ -20,32 +21,16 @@ const Calculator = () => {
     upfrontCost: 0,
     monthlyInstallment: 0,
   });
-  const [suburbs, setSuburbs] = useState([]);
   const [filteredSuburbs, setFilteredSuburbs] = useState([]);
   const [selectedSuburbInfo, setSelectedSuburbInfo] = useState(null);
   const [history, setHistory] = useState([]);
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [loadingCalc, setLoadingCalc] = useState(false);
 
-  // Load suburb data dynamically
-  useEffect(() => {
-    fetch('/Suburbs.json')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch suburbs');
-        return res.json();
-      })
-      .then((data) => setSuburbs(data))
-      .catch((err) => {
-        console.error(err);
-        toast.error('Could not load suburb data');
-      });
-  }, []);
-
-  // Load history from localStorage
   useEffect(() => {
     const now = new Date();
-    const history = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
-    const validHistory = history.filter((entry) => {
+    const storedHistory = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
+    const validHistory = storedHistory.filter((entry) => {
       const entryDate = new Date(entry.timestamp);
       const diffInDays = (now - entryDate) / (1000 * 60 * 60 * 24);
       return diffInDays <= EXPIRY_DAYS;
@@ -64,13 +49,13 @@ const Calculator = () => {
     setInputs(prev => ({ ...prev, suburb: value }));
     setSelectedSuburbInfo(null);
     const filtered = suburbs.filter(sub =>
-      sub.Suburb.toLowerCase().includes(value.toLowerCase())
+      sub.SP_NAME.toLowerCase().includes(value.toLowerCase())
     ).slice(0, 10);
     setFilteredSuburbs(filtered);
   };
 
   const handleSuburbSelect = (value) => {
-    setInputs(prev => ({ ...prev, suburb: value.Suburb }));
+    setInputs(prev => ({ ...prev, suburb: value.SP_NAME }));
     setSelectedSuburbInfo(value);
     setFilteredSuburbs([]);
   };
@@ -78,8 +63,8 @@ const Calculator = () => {
   const saveSubmissionToLocalStorage = (submission) => {
     const now = new Date();
     const timestampedSubmission = { ...submission, timestamp: now.toISOString() };
-    const history = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
-    const validHistory = history.filter((entry) => {
+    const storedHistory = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
+    const validHistory = storedHistory.filter((entry) => {
       const entryDate = new Date(entry.timestamp);
       const diffInDays = (now - entryDate) / (1000 * 60 * 60 * 24);
       return diffInDays <= EXPIRY_DAYS;
@@ -93,6 +78,7 @@ const Calculator = () => {
     const price = parseFloat(inputs.vehiclePrice);
     const mm = parseFloat(inputs.mmValue);
     if (
+      !inputs.clientName ||
       isNaN(price) || price <= 0 ||
       isNaN(mm) || mm <= 0 ||
       !inputs.suburb ||
@@ -105,14 +91,14 @@ const Calculator = () => {
 
     setLoadingCalc(true);
     setTimeout(() => {
-      const distance = parseFloat(selectedSuburbInfo.Distance_km);
+      const distance = parseFloat(selectedSuburbInfo.DIST_KM);
       const riskMultiplier =
         inputs.riskProfile === 'High' ? 1.3 :
         inputs.riskProfile === 'Medium' ? 1.15 : 1.0;
       const deposit = Math.round(price * 0.1 + distance * 30 * riskMultiplier);
       const repoCost = Math.round(mm * 0.05);
       const upfrontCost = Math.min(deposit + repoCost, 110000);
-      const monthlyInstallment = Math.round((price - deposit) / 48);
+      const monthlyInstallment = Math.round((price - deposit) / 54);
 
       const newResults = { deposit, repoCost, upfrontCost, monthlyInstallment };
       setResults(newResults);
@@ -133,18 +119,19 @@ const Calculator = () => {
         startY: 25,
         head: [['Field', 'Value']],
         body: [
+          ['Client Name', inputs.clientName],
           ['Vehicle Price', `R${inputs.vehiclePrice}`],
           ['M&M Value', `R${inputs.mmValue}`],
           ['Suburb', inputs.suburb],
-          ['Town', selectedSuburbInfo?.Town || ''],
-          ['Municipality', selectedSuburbInfo?.Municipality || ''],
+          ['Town', selectedSuburbInfo?.MN_NAME || ''],
+          ['Municipality', selectedSuburbInfo?.DC_NAME || ''],
           ['Province', selectedSuburbInfo?.Province || ''],
-          ['Distance (km)', selectedSuburbInfo?.Distance_km || ''],
+          ['Distance (km)', selectedSuburbInfo?.DIST_KM || ''],
           ['Risk Profile', inputs.riskProfile],
           ['Deposit', `R${results.deposit}`],
           ['Repo Cost', `R${results.repoCost}`],
           ['Upfront Cost', `R${results.upfrontCost}`],
-          ['Monthly Installment', `R${results.monthlyInstallment}`],
+          ['Monthly Installment (54 months)', `R${results.monthlyInstallment}`],
         ],
       });
       doc.save('SmartRentAuto_Calculation.pdf');
@@ -160,6 +147,15 @@ const Calculator = () => {
     <div className="p-4 max-w-xl mx-auto">
       <Toaster />
       <h1 className="text-3xl font-bold mb-6 text-center">SmartRent Auto™ Calculator</h1>
+
+      <input
+        type="text"
+        name="clientName"
+        placeholder="Client Name"
+        value={inputs.clientName}
+        onChange={handleChange}
+        className="w-full p-2 border rounded mb-3"
+      />
 
       <input
         type="number"
@@ -187,11 +183,20 @@ const Calculator = () => {
         <Combobox.Options className="border rounded shadow bg-white max-h-60 overflow-y-auto">
           {filteredSuburbs.map((suburb, idx) => (
             <Combobox.Option key={idx} value={suburb}>
-              {suburb.Suburb} ({suburb.Town})
+              {suburb.SP_NAME} ({suburb.MN_NAME})
             </Combobox.Option>
           ))}
         </Combobox.Options>
       </Combobox>
+
+      {selectedSuburbInfo && (
+        <div className="text-sm text-gray-700 mb-4">
+          <p><strong>Town:</strong> {selectedSuburbInfo.MN_NAME}</p>
+          <p><strong>Municipality:</strong> {selectedSuburbInfo.DC_NAME}</p>
+          <p><strong>Province:</strong> {selectedSuburbInfo.Province}</p>
+          <p><strong>Distance (km):</strong> {selectedSuburbInfo.DIST_KM}</p>
+        </div>
+      )}
 
       <select
         name="riskProfile"
@@ -218,7 +223,7 @@ const Calculator = () => {
         <p>Deposit: <strong>R{results.deposit.toLocaleString()}</strong></p>
         <p>Repo Cost: <strong>R{results.repoCost.toLocaleString()}</strong></p>
         <p>Upfront Cost (max R110,000): <strong>R{results.upfrontCost.toLocaleString()}</strong></p>
-        <p>Monthly Installment (48 months): <strong>R{results.monthlyInstallment.toLocaleString()}</strong></p>
+        <p>Monthly Installment (54 months): <strong>R{results.monthlyInstallment.toLocaleString()}</strong></p>
       </div>
 
       <button
@@ -236,10 +241,8 @@ const Calculator = () => {
         ) : (
           <ul className="space-y-2 max-h-60 overflow-y-auto border rounded p-2 bg-white">
             {history.map((entry, idx) => (
-              <li
-                key={idx}
-                className="p-2 border rounded hover:bg-gray-50"
-              >
+              <li key={idx} className="p-2 border rounded hover:bg-gray-50">
+                <div><strong>Client:</strong> {entry.inputs.clientName}</div>
                 <div><strong>Suburb:</strong> {entry.inputs.suburb}</div>
                 <div><strong>Vehicle Price:</strong> R{parseFloat(entry.inputs.vehiclePrice).toLocaleString()}</div>
                 <div><strong>Risk:</strong> {entry.inputs.riskProfile}</div>
@@ -254,3 +257,4 @@ const Calculator = () => {
 };
 
 export default Calculator;
+
