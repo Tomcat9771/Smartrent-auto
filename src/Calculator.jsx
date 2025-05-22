@@ -156,7 +156,7 @@ const Calculator = ({ suburbs }) => {
     <div className="p-4 max-w-xl mx-auto">
       <Toaster />
       <div className="flex items-center mb-6 bg-white p-2 rounded shadow">
-  <img src="/logo.jpg" alt="SmartRent Auto Logo" className="h-10 w-auto mr-3" />
+  <img src="/smart logo.jpg" alt="SmartRent Auto Logo" className="h-10 w-auto mr-3" />
   <h1 className="text-2xl font-bold text-gray-800">SmartRent Auto™ Calculator</h1>
 </div>
 
