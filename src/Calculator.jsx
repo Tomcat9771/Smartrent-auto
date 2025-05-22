@@ -21,7 +21,6 @@ const Calculator = ({ suburbs }) => {
     upfrontCost: 0,
     monthlyInstallment: 0,
   });
-  const [query, setQuery] = useState('');
   const [filteredSuburbs, setFilteredSuburbs] = useState([]);
   const [selectedSuburbInfo, setSelectedSuburbInfo] = useState(null);
   const [history, setHistory] = useState([]);
@@ -42,27 +41,24 @@ const Calculator = ({ suburbs }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'suburb') setSelectedSuburbInfo(null);
     setInputs(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSuburbInputChange = (value) => {
-    setQuery(value);
     setInputs(prev => ({ ...prev, suburb: value }));
     setSelectedSuburbInfo(null);
-
-    if (value === '') {
+    if (value.trim() === '') {
       setFilteredSuburbs([]);
       return;
     }
-
     const filtered = suburbs.filter(sub =>
-      sub.SP_NAME.toLowerCase().includes(value.toLowerCase())
+      sub.Suburb.toLowerCase().includes(value.toLowerCase())
     ).slice(0, 10);
     setFilteredSuburbs(filtered);
   };
 
   const handleSuburbSelect = (value) => {
-    setQuery(value.SP_NAME);
     setInputs(prev => ({ ...prev, suburb: value.SP_NAME }));
     setSelectedSuburbInfo(value);
     setFilteredSuburbs([]);
@@ -165,29 +161,35 @@ const Calculator = ({ suburbs }) => {
         className="w-full p-2 border rounded mb-3"
       />
 
-      <input
-        type="number"
-        name="vehiclePrice"
-        placeholder="Vehicle Price"
-        value={inputs.vehiclePrice}
-        onChange={handleChange}
-        className="w-full p-2 border rounded mb-3"
-      />
-      <input
-        type="number"
-        name="mmValue"
-        placeholder="Retail Value"
-        value={inputs.mmValue}
-        onChange={handleChange}
-        className="w-full p-2 border rounded mb-3"
-      />
+      <div className="relative mb-3">
+        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R</span>
+        <input
+          type="number"
+          name="vehiclePrice"
+          placeholder="Vehicle Price"
+          value={inputs.vehiclePrice}
+          onChange={handleChange}
+          className="w-full pl-7 p-2 border rounded"
+        />
+      </div>
 
-      <Combobox value={selectedSuburbInfo} onChange={handleSuburbSelect}>
+      <div className="relative mb-3">
+        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R</span>
+        <input
+          type="number"
+          name="mmValue"
+          placeholder="Retail Value"
+          value={inputs.mmValue}
+          onChange={handleChange}
+          className="w-full pl-7 p-2 border rounded"
+        />
+      </div>
+
+      <Combobox value={inputs.suburb} onChange={handleSuburbSelect}>
         <Combobox.Input
           placeholder="Start typing suburb..."
           className="w-full p-2 border rounded mb-3"
           onChange={(e) => handleSuburbInputChange(e.target.value)}
-          displayValue={() => query}
         />
         <Combobox.Options className="border rounded shadow bg-white max-h-60 overflow-y-auto">
           {filteredSuburbs.map((suburb, idx) => (
