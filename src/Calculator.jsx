@@ -26,6 +26,7 @@ const Calculator = ({ suburbs }) => {
   const [history, setHistory] = useState([]);
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [loadingCalc, setLoadingCalc] = useState(false);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     const now = new Date();
