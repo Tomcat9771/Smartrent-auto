@@ -45,24 +45,29 @@ const Calculator = ({ suburbs }) => {
     setInputs(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSuburbInputChange = (value) => {
+    const handleSuburbInputChange = (value) => {
+    setQuery(value);
     setInputs(prev => ({ ...prev, suburb: value }));
     setSelectedSuburbInfo(null);
-    if (value.trim() === '') {
+
+    if (value === '') {
       setFilteredSuburbs([]);
       return;
     }
+
     const filtered = suburbs.filter(sub =>
-      sub.Suburb.toLowerCase().includes(value.toLowerCase())
+      sub.SP_NAME.toLowerCase().includes(value.toLowerCase())
     ).slice(0, 10);
     setFilteredSuburbs(filtered);
   };
 
   const handleSuburbSelect = (value) => {
+    setQuery(value.SP_NAME);
     setInputs(prev => ({ ...prev, suburb: value.SP_NAME }));
     setSelectedSuburbInfo(value);
     setFilteredSuburbs([]);
   };
+
 
   const saveSubmissionToLocalStorage = (submission) => {
     const now = new Date();
