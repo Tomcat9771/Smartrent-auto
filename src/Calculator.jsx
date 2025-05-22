@@ -121,7 +121,7 @@ const Calculator = ({ suburbs }) => {
         body: [
           ['Client Name', inputs.clientName],
           ['Vehicle Price', `R${inputs.vehiclePrice}`],
-          ['M&M Value', `R${inputs.mmValue}`],
+          ['Retail Value', `R${inputs.mmValue}`],
           ['Suburb', inputs.suburb],
           ['Town', selectedSuburbInfo?.MP_NAME || ''],
           ['Municipality', selectedSuburbInfo?.DC_NAME || ''],
@@ -168,7 +168,7 @@ const Calculator = ({ suburbs }) => {
       <input
         type="number"
         name="mmValue"
-        placeholder="M&M Value"
+        placeholder="Retail Value"
         value={inputs.mmValue}
         onChange={handleChange}
         className="w-full p-2 border rounded mb-3"
