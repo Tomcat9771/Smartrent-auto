@@ -14,12 +14,26 @@ const Calculator = ({ suburbs }) => {
     mmValue: '',
     suburb: '',
     riskProfile: '',
+    manualDeposit: '',
+    termsInMonths: ''
   });
   const [results, setResults] = useState({
     deposit: 0,
     repoCost: 0,
     upfrontCost: 0,
     monthlyInstallment: 0,
+    loading: 0,
+    riskFactor: 0,
+    totalRentalAmount: 0,
+    G19: 0,
+    I21: 0,
+    I22: 0,
+    G21: 0,
+    netRentalAmount: 0,
+    monthlyBasePayment: 0,
+    monthlyInsurance: 0,
+    profitMargin: 0,
+    other: 580
   });
   const [filteredSuburbs, setFilteredSuburbs] = useState([]);
   const [selectedSuburbInfo, setSelectedSuburbInfo] = useState(null);
@@ -46,7 +60,7 @@ const Calculator = ({ suburbs }) => {
     setInputs(prev => ({ ...prev, [name]: value }));
   };
 
-    const handleSuburbInputChange = (value) => {
+  const handleSuburbInputChange = (value) => {
     setQuery(value);
     setInputs(prev => ({ ...prev, suburb: value }));
     setSelectedSuburbInfo(null);
@@ -86,13 +100,15 @@ const Calculator = ({ suburbs }) => {
   const calculate = () => {
     const price = parseFloat(inputs.vehiclePrice);
     const mm = parseFloat(inputs.mmValue);
+    const terms = parseInt(inputs.termsInMonths);
     if (
       !inputs.clientName ||
       isNaN(price) || price <= 0 ||
       isNaN(mm) || mm <= 0 ||
       !inputs.suburb ||
       !inputs.riskProfile ||
-      !selectedSuburbInfo
+      !selectedSuburbInfo ||
+      isNaN(terms) || terms <= 0
     ) {
       toast.error('Please fill in all fields correctly before calculating.');
       return;
@@ -100,16 +116,66 @@ const Calculator = ({ suburbs }) => {
 
     setLoadingCalc(true);
     setTimeout(() => {
+      // Loading
+      const loading = price * 0.10;
+      // Risk Factor
+      let riskFactor = loading;
+      if (inputs.riskProfile === 'Low') riskFactor = loading * 0.9;
+      if (inputs.riskProfile === 'High') riskFactor = loading * 1.1;
+      // Total Rental Amount
+      const totalRentalAmount = price + riskFactor;
+      // Repo Cost
       const distance = parseFloat(selectedSuburbInfo.DIST_KM);
-      const riskMultiplier =
-        inputs.riskProfile === 'High' ? 1.3 :
-        inputs.riskProfile === 'Medium' ? 1.15 : 1.0;
-      const deposit = Math.round(price * 0.1 + distance * 30 * riskMultiplier);
-      const repoCost = Math.round(mm * 0.05);
-      const upfrontCost = Math.min(deposit + repoCost, 110000);
-      const monthlyInstallment = Math.round((price - deposit) / 54);
+      const repoCostRaw = distance * 10;
+      const repoCost = repoCostRaw > 2000 ? 0 : repoCostRaw;
+      // G19
+      const G19 = totalRentalAmount * 0.20 + repoCost;
+      // I22
+      const I22 = repoCost - 2000;
+      // I21
+      const I21 = totalRentalAmount - 110000 + 4000;
+      // G21
+      const G21 = I21 + I22;
+      // Deposit
+      const deposit = inputs.manualDeposit
+        ? parseFloat(inputs.manualDeposit)
+        : G21;
+      // Net Rental Amount
+      const netRentalAmount = totalRentalAmount - (deposit + repoCost);
+      // Upfront Cost
+      const licenseAndRegistration = 2500;
+      const documentFees = 1500;
+      const upfrontCost = netRentalAmount + licenseAndRegistration + documentFees;
+      // Monthly base payment
+      const monthlyBasePayment = upfrontCost / terms;
+      // Monthly insurance
+      const monthlyInsurance = mm * 0.008167;
+      // Profit Margin
+      const profitMargin = monthlyBasePayment * 1.05;
+      // Other
+      const other = 580;
+      // Monthly Installment
+      const monthlyInstallment =
+        monthlyBasePayment + monthlyInsurance + profitMargin + other;
 
-      const newResults = { deposit, repoCost, upfrontCost, monthlyInstallment };
+      const newResults = {
+        loading,
+        riskFactor,
+        totalRentalAmount,
+        repoCost,
+        G19,
+        I22,
+        I21,
+        G21,
+        deposit,
+        netRentalAmount,
+        upfrontCost,
+        monthlyBasePayment,
+        monthlyInsurance,
+        profitMargin,
+        other,
+        monthlyInstallment
+      };
       setResults(newResults);
 
       saveSubmissionToLocalStorage({ inputs, results: newResults });
@@ -137,10 +203,25 @@ const Calculator = ({ suburbs }) => {
           ['Province', selectedSuburbInfo?.Province || ''],
           ['Distance (km)', selectedSuburbInfo?.DIST_KM || ''],
           ['Risk Profile', inputs.riskProfile],
-          ['Deposit', `R${results.deposit}`],
-          ['Repo Cost', `R${results.repoCost}`],
-          ['Upfront Cost', `R${results.upfrontCost}`],
-          ['Monthly Installment (54 months)', `R${results.monthlyInstallment}`],
+          ['Loading', `R${results.loading.toLocaleString()}`],
+          ['Risk Factor', `R${results.riskFactor.toLocaleString()}`],
+          ['Total Rental Amount', `R${results.totalRentalAmount.toLocaleString()}`],
+          ['Repo Cost', `R${results.repoCost.toLocaleString()}`],
+          ['G19', `R${results.G19.toLocaleString()}`],
+          ['I22', `R${results.I22.toLocaleString()}`],
+          ['I21', `R${results.I21.toLocaleString()}`],
+          ['G21 / Deposit', `R${results.deposit.toLocaleString()}`],
+          ['Manual Deposit', inputs.manualDeposit ? `R${inputs.manualDeposit}` : ''],
+          ['Net Rental Amount', `R${results.netRentalAmount.toLocaleString()}`],
+          ['License & Registration', `R2500`],
+          ['Document Fees', `R1500`],
+          ['Upfront Cost', `R${results.upfrontCost.toLocaleString()}`],
+          ['Terms (months)', inputs.termsInMonths],
+          ['Monthly Base Payment', `R${results.monthlyBasePayment.toFixed(2)}`],
+          ['Monthly Insurance', `R${results.monthlyInsurance.toFixed(2)}`],
+          ['Profit Margin', `R${results.profitMargin.toFixed(2)}`],
+          ['Other', `R${results.other}`],
+          ['Monthly Installment', `R${results.monthlyInstallment.toFixed(2)}`]
         ],
       });
       doc.save('SmartRentAuto_Calculation.pdf');
@@ -156,10 +237,9 @@ const Calculator = ({ suburbs }) => {
     <div className="p-4 max-w-xl mx-auto">
       <Toaster />
       <div className="flex items-center mb-6 bg-white p-2 rounded shadow">
-  <img src="/smart logo.jpg" alt="SmartRent Auto Logo" className="h-10 w-auto mr-3" />
-  <h1 className="text-2xl font-bold text-gray-800">SmartRent Auto™ Calculator</h1>
-</div>
-
+        <img src="/smart logo.jpg" alt="SmartRent Auto Logo" className="h-10 w-auto mr-3" />
+        <h1 className="text-2xl font-bold text-gray-800">SmartRent Auto™ Calculator</h1>
+      </div>
 
       <input
         type="text"
@@ -241,9 +321,36 @@ const Calculator = ({ suburbs }) => {
       <div className="bg-gray-100 p-4 rounded mb-6">
         <h2 className="font-semibold mb-2">Results</h2>
         <p>Deposit: <strong>R{results.deposit.toLocaleString()}</strong></p>
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700">Manual Deposit</label>
+          <input
+            type="number"
+            name="manualDeposit"
+            placeholder="Enter manual deposit"
+            value={inputs.manualDeposit}
+            onChange={handleChange}
+            className="w-full p-2 border rounded mt-1"
+          />
+        </div>
         <p>Repo Cost: <strong>R{results.repoCost.toLocaleString()}</strong></p>
-        <p>Upfront Cost (max R110,000): <strong>R{results.upfrontCost.toLocaleString()}</strong></p>
-        <p>Monthly Installment (54 months): <strong>R{results.monthlyInstallment.toLocaleString()}</strong></p>
+        <p>Net Rental Amount: <strong>R{results.netRentalAmount.toLocaleString()}</strong></p>
+        <p>Upfront Cost: <strong>R{results.upfrontCost.toLocaleString()}</strong></p>
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700">Terms in months</label>
+          <input
+            type="number"
+            name="termsInMonths"
+            placeholder="Enter terms in months"
+            value={inputs.termsInMonths}
+            onChange={handleChange}
+            className="w-full p-2 border rounded mt-1"
+          />
+        </div>
+        <p>Monthly Base Payment: <strong>R{results.monthlyBasePayment.toFixed(2)}</strong></p>
+        <p>Monthly Insurance: <strong>R{results.monthlyInsurance.toFixed(2)}</strong></p>
+        <p>Profit Margin: <strong>R{results.profitMargin.toFixed(2)}</strong></p>
+        <p>Other: <strong>R{results.other}</strong></p>
+        <p>Monthly Installment: <strong>R{results.monthlyInstallment.toFixed(2)}</strong></p>
       </div>
 
       <button
