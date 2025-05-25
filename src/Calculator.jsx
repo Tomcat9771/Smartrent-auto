@@ -127,7 +127,7 @@ const Calculator = ({ suburbs }) => {
       // Repo Cost
       const distance = parseFloat(selectedSuburbInfo.DIST_KM);
       const repoCostRaw = distance * 10;
-      const repoCost = repoCostRaw > 2000 ? 0 : repoCostRaw;
+      const repoCost = repoCostRaw < 2000 ? 0 : repoCostRaw;
       // G19
       const G19 = totalRentalAmount * 0.20 + repoCost;
       // I22
