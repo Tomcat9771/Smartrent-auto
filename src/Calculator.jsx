@@ -8,7 +8,9 @@ import { useParams } from 'react-router-dom';
 
 const MAX_ENTRIES = 10;
 const EXPIRY_DAYS = 7;
-
+useEffect(() => {
+  console.log('Calculator mounted with client:', clientId);
+}, []);
 const { clientId } = useParams();
 
 useEffect(() => {
