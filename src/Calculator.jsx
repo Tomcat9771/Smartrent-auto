@@ -7,8 +7,6 @@ import { Combobox } from '@headlessui/react';
 const MAX_ENTRIES = 10;
 const EXPIRY_DAYS = 7;
 
-
-
 const Calculator = ({ suburbs }) => {
   const [inputs, setInputs] = useState({
     clientName: '',
@@ -98,19 +96,8 @@ const Calculator = ({ suburbs }) => {
     localStorage.setItem('calculatorHistory', JSON.stringify(updatedHistory));
     setHistory(updatedHistory);
   };
-  const resetCounter = () => {
-  localStorage.removeItem('calculatorHistory');
-  setHistory([]);
-  toast.success('Calculation counter has been reset.');
-};
 
   const calculate = () => {
-    
-     if (history.length >= MAX_ENTRIES) {
-    toast.error('You have reached the maximum of 10 calculations.');
-    return;
-  }
- 
     const price = parseFloat(inputs.vehiclePrice);
     const mm = parseFloat(inputs.mmValue);
     const terms = parseInt(inputs.termsInMonths);
@@ -393,5 +380,3 @@ const Calculator = ({ suburbs }) => {
 };
 
 export default Calculator;
-
-
