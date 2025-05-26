@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Calculator from './Calculator';
 import { Toaster } from 'react-hot-toast';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
   const [suburbs, setSuburbs] = useState([]);
@@ -14,26 +13,18 @@ function App() {
   }, []);
 
   return (
-    <Router>
+    <div className="min-h-screen bg-gray-50 p-8">
       <Toaster position="top-right" />
-      <Routes>
-        <Route
-          path="/calculator/:clientId"
-          element={
-            suburbs.length > 0 ? (
-              <Calculator suburbs={suburbs} />
-            ) : (
-              <p className="p-8">Loading suburbs data...</p>
-            )
-          }
-        />
-        <Route path="*" element={<div className="text-center p-8">404 - Page Not Found</div>} />
-      </Routes>
-    </Router>
+      <h1 className="text-2xl font-bold mb-6">
+        SmartRent Auto™ - Rent-to-Own Vehicle Calculator
+      </h1>
+      {suburbs.length > 0 ? (
+        <Calculator suburbs={suburbs} />
+      ) : (
+        <p>Loading suburbs data...</p>
+      )}
+    </div>
   );
 }
 
 export default App;
-
-
-
