@@ -6,18 +6,21 @@ import { Combobox } from '@headlessui/react';
 
 const MAX_ENTRIES = 10;
 const EXPIRY_DAYS = 7;
-const [isAdmin, setIsAdmin] = useState(false);
-useEffect(() => {
-  const handleKeyCombo = (e) => {
-    if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 't') {
-      setIsAdmin(true);
-      toast.success('🔓 Admin access granted. Limit removed.');
-    }
-  };
-  window.addEventListener('keydown', handleKeyCombo);
-  return () => window.removeEventListener('keydown', handleKeyCombo);
-}, []);
+
+
 const Calculator = ({ suburbs }) => {
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    const handleKeyCombo = (e) => {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 't') {
+        setIsAdmin(true);
+        toast.success('🔓 Admin access granted. Limit removed.');
+      }
+    };
+    window.addEventListener('keydown', handleKeyCombo);
+    return () => window.removeEventListener('keydown', handleKeyCombo);
+  }, []);
+
   const [inputs, setInputs] = useState({
     clientName: '',
     vehiclePrice: '',
