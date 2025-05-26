@@ -98,6 +98,10 @@ const Calculator = ({ suburbs }) => {
   };
 
   const calculate = () => {
+     if (history.length >= MAX_ENTRIES) {
+    toast.error('You have reached the maximum of 10 calculations.');
+    return;
+  }
     const price = parseFloat(inputs.vehiclePrice);
     const mm = parseFloat(inputs.mmValue);
     const terms = parseInt(inputs.termsInMonths);

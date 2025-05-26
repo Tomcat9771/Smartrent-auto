@@ -16,14 +16,19 @@ body {
 }
 
 .btn-primary {
-  @apply bg-primary hover:bg-blue-700;
+  @apply bg-primary;
+}
+.btn-primary:hover {
+  @apply bg-primary-dark;
 }
 
 .btn-secondary {
-  @apply bg-secondary hover:bg-green-700;
+  @apply bg-secondary;
+}
+.btn-secondary:hover {
+  @apply bg-secondary-dark;
 }
 
-/* Optional Spinner */
 .spinner {
   @apply animate-spin rounded-full border-4 border-t-transparent border-primary h-6 w-6;
 }
