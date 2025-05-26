@@ -317,6 +317,12 @@ const Calculator = ({ suburbs }) => {
       >
         {loadingCalc ? 'Calculating...' : 'Calculate'}
       </button>
+        <button
+          onClick={handleClear}
+          className="flex-1 bg-gray-400 text-white py-2 rounded hover:bg-gray-500"
+        >
+          Clear
+        </button>
 
       <div className="bg-gray-100 p-4 rounded mb-6">
         <h2 className="font-semibold mb-2">Results</h2>
