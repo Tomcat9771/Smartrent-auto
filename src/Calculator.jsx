@@ -98,6 +98,9 @@ const Calculator = ({ suburbs }) => {
   };
 
   const calculate = () => {
+    <div className="mb-4 text-sm text-gray-600 text-center">
+  Calculations used: {history.length} / {MAX_ENTRIES}
+</div>
      if (history.length >= MAX_ENTRIES) {
     toast.error('You have reached the maximum of 10 calculations.');
     return;
