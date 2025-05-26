@@ -130,12 +130,10 @@ const Calculator = ({ suburbs }) => {
       const repoCost = repoCostRaw < 2000 ? 0 : repoCostRaw;
       // G19
       const G19 = totalRentalAmount * 0.20 + repoCost;
-      // I22
-      const I22 = repoCost - 2000;
       // I21
       const I21 = totalRentalAmount - 110000 + 4000;
       // G21
-      const G21 = I21 + I22;
+      const G21 = I21;
       // Deposit
       const deposit = inputs.manualDeposit
         ? parseFloat(inputs.manualDeposit)
@@ -384,7 +382,3 @@ const Calculator = ({ suburbs }) => {
 };
 
 export default Calculator;
-
-
-
-
