@@ -7,17 +7,7 @@ import { Combobox } from '@headlessui/react';
 const MAX_ENTRIES = 10;
 const EXPIRY_DAYS = 7;
 
-<div className="mb-4 text-sm text-gray-600 text-center">
-  Calculations used: {history.length} / {MAX_ENTRIES}
-  {history.length > 0 && (
-    <button
-      onClick={resetCounter}
-      className="ml-2 text-blue-600 hover:underline"
-    >
-      Reset Counter
-    </button>
-  )}
-</div>
+
 
 const Calculator = ({ suburbs }) => {
   const [inputs, setInputs] = useState({
