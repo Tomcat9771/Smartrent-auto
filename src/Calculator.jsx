@@ -309,7 +309,17 @@ const Calculator = ({ suburbs }) => {
         <option value="Medium">Medium</option>
         <option value="High">High</option>
       </select>
-
+ <div className="mb-3">
+        <label className="block text-sm font-medium text-gray-700">Terms in months</label>
+        <input
+          type="number"
+          name="termsInMonths"
+          placeholder="Enter terms in months"
+          value={inputs.termsInMonths}
+          onChange={handleChange}
+          className="w-full p-2 border rounded mt-1"
+        />
+      </div>
       <button
         onClick={calculate}
         className="w-full bg-blue-600 text-white py-2 rounded mb-4 hover:bg-blue-700"
@@ -335,17 +345,7 @@ const Calculator = ({ suburbs }) => {
         <p>Repo Cost: <strong>R{results.repoCost.toLocaleString()}</strong></p>
         <p>Net Rental Amount: <strong>R{results.netRentalAmount.toLocaleString()}</strong></p>
         <p>Upfront Cost: <strong>R{results.upfrontCost.toLocaleString()}</strong></p>
-        <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700">Terms in months</label>
-          <input
-            type="number"
-            name="termsInMonths"
-            placeholder="Enter terms in months"
-            value={inputs.termsInMonths}
-            onChange={handleChange}
-            className="w-full p-2 border rounded mt-1"
-          />
-        </div>
+        
         <p>Monthly Installment: <strong>R{results.monthlyInstallment.toFixed(2)}</strong></p>
       </div>
 
