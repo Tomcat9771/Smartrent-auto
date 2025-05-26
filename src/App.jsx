@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import Calculator from './Calculator';
 import { Toaster } from 'react-hot-toast';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/calculator/:clientId" element={<Calculator />} />
+        {/* Optional default route */}
+        <Route path="*" element={<div>404 Not Found</div>} />
+      </Routes>
+    </Router>
+  );
+}
 function App() {
   const [suburbs, setSuburbs] = useState([]);
 

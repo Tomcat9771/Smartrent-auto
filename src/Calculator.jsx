@@ -3,9 +3,19 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import toast, { Toaster } from 'react-hot-toast';
 import { Combobox } from '@headlessui/react';
+import { useParams } from 'react-router-dom';
+
 
 const MAX_ENTRIES = 10;
 const EXPIRY_DAYS = 7;
+
+const { clientId } = useParams();
+
+useEffect(() => {
+  if (clientId) {
+    setInputs(prev => ({ ...prev, clientName: decodeURIComponent(clientId.replace(/-/g, ' ')) }));
+  }
+}, [clientId]);
 
 const Calculator = ({ suburbs }) => {
   const [inputs, setInputs] = useState({
