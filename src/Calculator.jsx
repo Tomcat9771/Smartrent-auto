@@ -346,10 +346,7 @@ const Calculator = ({ suburbs }) => {
             className="w-full p-2 border rounded mt-1"
           />
         </div>
-        <p>Monthly Base Payment: <strong>R{results.monthlyBasePayment.toFixed(2)}</strong></p>
-        <p>Monthly Insurance: <strong>R{results.monthlyInsurance.toFixed(2)}</strong></p>
-        <p>Profit Margin: <strong>R{results.profitMargin.toFixed(2)}</strong></p>
-        <p>Other: <strong>R{results.other}</strong></p>
+        
         <p>Monthly Installment: <strong>R{results.monthlyInstallment.toFixed(2)}</strong></p>
       </div>
 
