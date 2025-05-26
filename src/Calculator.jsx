@@ -110,12 +110,19 @@ const Calculator = ({ suburbs }) => {
     toast.error('You have reached the maximum of 10 calculations.');
     return;
   }
-  <button
-  onClick={resetCounter}
-  className="text-sm text-blue-600 hover:underline mt-2"
->
-  Reset Counter
-</button>
+  // Update UI near the calculation counter display
+<div className="mb-4 text-sm text-gray-600 text-center">
+  Calculations used: {history.length} / {MAX_ENTRIES}
+  {history.length > 0 && (
+    <button
+      onClick={resetCounter}
+      className="ml-2 text-blue-600 hover:underline"
+    >
+      Reset Counter
+    </button>
+  )}
+</div>
+
     const price = parseFloat(inputs.vehiclePrice);
     const mm = parseFloat(inputs.mmValue);
     const terms = parseInt(inputs.termsInMonths);
