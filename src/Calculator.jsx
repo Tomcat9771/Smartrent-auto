@@ -7,6 +7,18 @@ import { Combobox } from '@headlessui/react';
 const MAX_ENTRIES = 10;
 const EXPIRY_DAYS = 7;
 
+<div className="mb-4 text-sm text-gray-600 text-center">
+  Calculations used: {history.length} / {MAX_ENTRIES}
+  {history.length > 0 && (
+    <button
+      onClick={resetCounter}
+      className="ml-2 text-blue-600 hover:underline"
+    >
+      Reset Counter
+    </button>
+  )}
+</div>
+
 const Calculator = ({ suburbs }) => {
   const [inputs, setInputs] = useState({
     clientName: '',
@@ -103,26 +115,12 @@ const Calculator = ({ suburbs }) => {
 };
 
   const calculate = () => {
-    <div className="mb-4 text-sm text-gray-600 text-center">
-  Calculations used: {history.length} / {MAX_ENTRIES}
-</div>
+    
      if (history.length >= MAX_ENTRIES) {
     toast.error('You have reached the maximum of 10 calculations.');
     return;
   }
-  // Update UI near the calculation counter display
-<div className="mb-4 text-sm text-gray-600 text-center">
-  Calculations used: {history.length} / {MAX_ENTRIES}
-  {history.length > 0 && (
-    <button
-      onClick={resetCounter}
-      className="ml-2 text-blue-600 hover:underline"
-    >
-      Reset Counter
-    </button>
-  )}
-</div>
-
+ 
     const price = parseFloat(inputs.vehiclePrice);
     const mm = parseFloat(inputs.mmValue);
     const terms = parseInt(inputs.termsInMonths);
