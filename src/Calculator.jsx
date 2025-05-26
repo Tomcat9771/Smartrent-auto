@@ -96,6 +96,11 @@ const Calculator = ({ suburbs }) => {
     localStorage.setItem('calculatorHistory', JSON.stringify(updatedHistory));
     setHistory(updatedHistory);
   };
+  const resetCounter = () => {
+  localStorage.removeItem('calculatorHistory');
+  setHistory([]);
+  toast.success('Calculation counter has been reset.');
+};
 
   const calculate = () => {
     <div className="mb-4 text-sm text-gray-600 text-center">
@@ -105,6 +110,12 @@ const Calculator = ({ suburbs }) => {
     toast.error('You have reached the maximum of 10 calculations.');
     return;
   }
+  <button
+  onClick={resetCounter}
+  className="text-sm text-blue-600 hover:underline mt-2"
+>
+  Reset Counter
+</button>
     const price = parseFloat(inputs.vehiclePrice);
     const mm = parseFloat(inputs.mmValue);
     const terms = parseInt(inputs.termsInMonths);
