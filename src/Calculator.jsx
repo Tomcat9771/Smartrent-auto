@@ -131,7 +131,7 @@ const Calculator = ({ suburbs }) => {
       // G19
       const G19 = totalRentalAmount * 0.20 + repoCost;
       // I22
-      const I22 = repoCost - 2000;
+      const I22 = repoCost;
       // I21
       const I21 = totalRentalAmount - 110000 + 4000;
       // G21
