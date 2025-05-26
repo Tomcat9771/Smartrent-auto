@@ -18,6 +18,39 @@ const Calculator = ({ suburbs }) => {
       }
     };
     window.addEventListener('keydown', handleKeyCombo);
+    const resetCalculator = () => {
+  setInputs({
+    clientName: '',
+    vehiclePrice: '',
+    mmValue: '',
+    suburb: '',
+    riskProfile: '',
+    manualDeposit: '',
+    termsInMonths: ''
+  });
+  setResults({
+    deposit: 0,
+    repoCost: 0,
+    upfrontCost: 0,
+    monthlyInstallment: 0,
+    loading: 0,
+    riskFactor: 0,
+    totalRentalAmount: 0,
+    G19: 0,
+    I21: 0,
+    I22: 0,
+    G21: 0,
+    netRentalAmount: 0,
+    monthlyBasePayment: 0,
+    monthlyInsurance: 0,
+    profitMargin: 0,
+    other: 580
+  });
+  setSelectedSuburbInfo(null);
+  setFilteredSuburbs([]);
+  setQuery('');
+};
+
     return () => window.removeEventListener('keydown', handleKeyCombo);
   }, []);
 
@@ -348,7 +381,13 @@ const Calculator = ({ suburbs }) => {
       >
         {loadingCalc ? 'Calculating...' : 'Calculate'}
       </button>
-
+<button
+  onClick={resetCalculator}
+  className="w-full bg-gray-600 text-white py-2 rounded mb-4 hover:bg-gray-700"
+  disabled={loadingCalc}
+>
+  Reset
+</button>
       <div className="bg-gray-100 p-4 rounded mb-6">
         <h2 className="font-semibold mb-2">Results</h2>
         <p>Deposit: <strong>R{results.deposit.toLocaleString()}</strong></p>
