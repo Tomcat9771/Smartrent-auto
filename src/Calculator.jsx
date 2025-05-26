@@ -10,8 +10,7 @@ const EXPIRY_DAYS = 7;
 
 const Calculator = ({ suburbs }) => {
   const [isAdmin, setIsAdmin] = useState(false);
-  useEffect(() => {
-    const handleKeyCombo = (e) => {
+      const handleKeyCombo = (e) => {
       if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 't') {
         setIsAdmin(true);
         toast.success('🔓 Admin access granted. Limit removed.');
@@ -50,6 +49,15 @@ const Calculator = ({ suburbs }) => {
   setFilteredSuburbs([]);
   setQuery('');
 };
+
+  useEffect(() => {
+const handleKeyCombo = (e) => {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 't') {
+        setIsAdmin(true);
+        toast.success('🔓 Admin access granted. Limit removed.');
+      }
+    };
+    window.addEventListener('keydown', handleKeyCombo);
 
     return () => window.removeEventListener('keydown', handleKeyCombo);
   }, []);
