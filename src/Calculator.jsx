@@ -346,7 +346,6 @@ const Calculator = ({ suburbs }) => {
             className="w-full p-2 border rounded mt-1"
           />
         </div>
-        
         <p>Monthly Installment: <strong>R{results.monthlyInstallment.toFixed(2)}</strong></p>
       </div>
 
@@ -381,4 +380,5 @@ const Calculator = ({ suburbs }) => {
 };
 
 export default Calculator;
+
 
