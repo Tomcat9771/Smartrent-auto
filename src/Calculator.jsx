@@ -327,7 +327,10 @@ setInputErrors({});  // Clear any previous errors
         <img src="/smart logo.jpg" alt="SmartRent Auto Logo" className="h-10 w-auto mr-3" />
         <h1 className="text-2xl font-bold text-gray-800">SmartRent Auto™ Calculator</h1>
       </div>
-
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Client Name
+        </label>
       <input
         type="text"
         name="clientName"
@@ -336,31 +339,50 @@ setInputErrors({});  // Clear any previous errors
         onChange={handleChange}
         className="w-full p-2 border rounded mb-3"
       />
-
-      <div className="relative mb-3">
-        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R</span>
-        <input
-          type="number"
-          name="vehiclePrice"
-          placeholder="Vehicle Price"
-          value={inputs.vehiclePrice}
-          onChange={handleChange}
-          className="w-full pl-7 p-2 border rounded"
-        />
       </div>
 
-      <div className="relative mb-3">
-        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R</span>
-        <input
-          type="number"
-          name="mmValue"
-          placeholder="Retail Value"
-          value={inputs.mmValue}
-          onChange={handleChange}
-          className="w-full pl-7 p-2 border rounded"
-        />
-      </div>
+         <div className="mb-3">
+    <label htmlFor="vehiclePrice" className="block text-sm font-medium text-gray-700 mb-1">
+      Vehicle Price
+    </label>
+    <div className="relative flex items-center">
+      <span className="absolute left-3 text-gray-500 pointer-events-none">R</span>
+      <input
+        id="vehiclePrice"
+        type="number"
+        name="vehiclePrice"
+        placeholder="Vehicle Price"
+        value={inputs.vehiclePrice}
+        onChange={handleChange}
+        className="w-full pl-7 p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      />
+    </div>
+  </div>
+  
+        <div className="relative mb-3">
+          <label htmlFor="mmValue" className="block text-sm font-medium text-gray-700 mb-1">
+            Retail Value
+          </label>
+            <div className="relative flex items-center">
+            <span className="absolute left-3 text-gray-500 pointer-events-none">R</span>
 
+
+          <input
+            id="mmValue"
+            type="number"
+            name="mmValue"
+            placeholder="Retail Value"
+            value={inputs.mmValue}
+            onChange={handleChange}
+            className="w-full pl-7 p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+         />
+        </div>
+       </div>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Suburb name
+        </label>
       <Combobox value={inputs.suburb} onChange={handleSuburbSelect}>
         <Combobox.Input
           placeholder="Start typing suburb..."
@@ -375,7 +397,7 @@ setInputErrors({});  // Clear any previous errors
           ))}
         </Combobox.Options>
       </Combobox>
-
+      </div>
       {selectedSuburbInfo && (
         <div className="text-sm text-gray-700 mb-4">
           <p><strong>Town:</strong> {selectedSuburbInfo.MP_NAME}</p>
@@ -384,7 +406,10 @@ setInputErrors({});  // Clear any previous errors
           <p><strong>Distance (km):</strong> {selectedSuburbInfo.DIST_KM}</p>
         </div>
       )}
-
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Risk Profile
+        </label>
       <select
         name="riskProfile"
         value={inputs.riskProfile}
@@ -396,6 +421,7 @@ setInputErrors({});  // Clear any previous errors
         <option value="Medium">Medium</option>
         <option value="High">High</option>
       </select>
+      </div>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
