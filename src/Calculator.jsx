@@ -4,11 +4,12 @@ import autoTable from 'jspdf-autotable';
 import toast, { Toaster } from 'react-hot-toast';
 import { Combobox } from '@headlessui/react';
 
-const MAX_ENTRIES = 10;
-const EXPIRY_DAYS = 7;
-
+const MAX_ENTRIES = 1000;
+const EXPIRY_DAYS = 365;
 
 const Calculator = ({ suburbs }) => {
+  const [creditScore, setCreditScore] = useState('');
+
   const [isAdmin, setIsAdmin] = useState(false);
       const handleKeyCombo = (e) => {
       if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 't') {
@@ -43,7 +44,7 @@ const Calculator = ({ suburbs }) => {
     monthlyBasePayment: 0,
     monthlyInsurance: 0,
     profitMargin: 0,
-    other: 580
+    other: 0
   });
   setSelectedSuburbInfo(null);
   setFilteredSuburbs([]);
@@ -87,7 +88,7 @@ const handleKeyCombo = (e) => {
     monthlyBasePayment: 0,
     monthlyInsurance: 0,
     profitMargin: 0,
-    other: 580
+    other: 0
   });
   const [filteredSuburbs, setFilteredSuburbs] = useState([]);
   const [selectedSuburbInfo, setSelectedSuburbInfo] = useState(null);
@@ -163,18 +164,48 @@ const handleKeyCombo = (e) => {
     const price = parseFloat(inputs.vehiclePrice);
     const mm = parseFloat(inputs.mmValue);
     const terms = parseInt(inputs.termsInMonths);
-    if (
-      !inputs.clientName ||
-      isNaN(price) || price <= 0 ||
-      isNaN(mm) || mm <= 0 ||
-      !inputs.suburb ||
-      !inputs.riskProfile ||
-      !selectedSuburbInfo ||
-      isNaN(terms) || terms <= 0
-    ) {
-      toast.error('Please fill in all fields correctly before calculating.');
-      return;
-    }
+const errors = {};
+
+if (!inputs.clientName) {
+  errors.clientName = 'Client Name is required.';
+}
+
+if (isNaN(price) || price <= 0) {
+  errors.price = 'Vehicle Price must be a valid number greater than 0.';
+}
+
+if (isNaN(mm) || mm <= 0) {
+  errors.mm = 'M&M Value must be a valid number greater than 0.';
+}
+
+if (!inputs.suburb) {
+  errors.suburb = 'Please select a Suburb.';
+}
+
+if (!selectedSuburbInfo) {
+  errors.selectedSuburbInfo = 'Selected Suburb is invalid or not found in the database.';
+}
+
+if (!inputs.riskProfile) {
+  errors.riskProfile = 'Please select a Risk Profile.';
+}
+
+if (isNaN(terms) || terms <= 0) {
+  errors.terms = 'Terms must be a valid number greater than 0.';
+}
+
+if (isNaN(inputs.creditScore) || inputs.creditScore < 0 || inputs.creditScore > 999) {
+  errors.creditScore = 'Credit Score must be a number between 0 and 999.';
+}
+
+if (Object.keys(errors).length > 0) {
+  Object.values(errors).forEach(msg => toast.error(msg));
+  setInputErrors(errors);  // State to trigger red borders
+  return;
+}
+
+// If all inputs are valid
+setInputErrors({});  // Clear any previous errors
 
     setLoadingCalc(true);
     setTimeout(() => {
@@ -188,8 +219,8 @@ const handleKeyCombo = (e) => {
       const totalRentalAmount = price + riskFactor;
       // Repo Cost
       const distance = parseFloat(selectedSuburbInfo.DIST_KM);
-      const repoCostRaw = distance * 10;
-      const repoCost = repoCostRaw < 2000 ? 0 : repoCostRaw;
+      const repoCost = distance * 10;
+      
       // G19
       const G19 = totalRentalAmount * 0.20 + repoCost;
       // I22
@@ -215,10 +246,10 @@ const handleKeyCombo = (e) => {
       // Profit Margin
       const profitMargin = monthlyBasePayment * 1.05;
       // Other
-      const other = 580;
+      const other = 0;
       // Monthly Installment
       const monthlyInstallment =
-        monthlyBasePayment + monthlyInsurance + profitMargin + other;
+        monthlyBasePayment + monthlyInsurance + profitMargin;
 
       const newResults = {
         loading,
@@ -269,20 +300,14 @@ const handleKeyCombo = (e) => {
           ['Risk Factor', `R${results.riskFactor.toLocaleString()}`],
           ['Total Rental Amount', `R${results.totalRentalAmount.toLocaleString()}`],
           ['Repo Cost', `R${results.repoCost.toLocaleString()}`],
-          ['G19', `R${results.G19.toLocaleString()}`],
-          ['I22', `R${results.I22.toLocaleString()}`],
-          ['I21', `R${results.I21.toLocaleString()}`],
-          ['G21 / Deposit', `R${results.deposit.toLocaleString()}`],
+          
           ['Manual Deposit', inputs.manualDeposit ? `R${inputs.manualDeposit}` : ''],
           ['Net Rental Amount', `R${results.netRentalAmount.toLocaleString()}`],
           ['License & Registration', `R2500`],
           ['Document Fees', `R1500`],
           ['Upfront Cost', `R${results.upfrontCost.toLocaleString()}`],
           ['Terms (months)', inputs.termsInMonths],
-          ['Monthly Base Payment', `R${results.monthlyBasePayment.toFixed(2)}`],
-          ['Monthly Insurance', `R${results.monthlyInsurance.toFixed(2)}`],
-          ['Profit Margin', `R${results.profitMargin.toFixed(2)}`],
-          ['Other', `R${results.other}`],
+          
           ['Monthly Installment', `R${results.monthlyInstallment.toFixed(2)}`]
         ],
       });
@@ -371,7 +396,23 @@ const handleKeyCombo = (e) => {
         <option value="Medium">Medium</option>
         <option value="High">High</option>
       </select>
- <div className="mb-3">
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Credit Score
+        </label>
+        <input
+          type="number"
+          className="w-full p-2 border border-gray-300 rounded"
+          value={creditScore}
+          onChange={(e) => setCreditScore(e.target.value)}
+          placeholder="e.g. 650"
+          min="0"
+          max="999"
+        />
+      </div>
+
+      <div className="mb-3">
         <label className="block text-sm font-medium text-gray-700">Terms in months</label>
         <input
           type="number"
@@ -448,4 +489,5 @@ const handleKeyCombo = (e) => {
 };
 
 export default Calculator;
+
 
