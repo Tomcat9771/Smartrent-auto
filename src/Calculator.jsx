@@ -6,10 +6,11 @@ import { Combobox } from '@headlessui/react';
 
 const MAX_ENTRIES = 1000;
 const EXPIRY_DAYS = 365;
+// const [inputErrors, setInputErrors] = useState({});
 
 const Calculator = ({ suburbs }) => {
   const [creditScore, setCreditScore] = useState('');
-
+  const [inputErrors, setInputErrors] = useState({});
   const [isAdmin, setIsAdmin] = useState(false);
       const handleKeyCombo = (e) => {
       if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 't') {
@@ -110,10 +111,17 @@ const handleKeyCombo = (e) => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'suburb') setSelectedSuburbInfo(null);
-    setInputs(prev => ({ ...prev, [name]: value }));
-  };
+  const { name, value } = e.target;
+
+  setInputs((prev) => ({
+    ...prev,
+    [name]: name === "creditScore"
+      ? value === "" ? "" : Number(value)
+      : value,
+  }));
+
+  if (name === "suburb") setSelectedSuburbInfo(null);
+};
 
   const handleSuburbInputChange = (value) => {
     setQuery(value);
@@ -194,7 +202,12 @@ if (isNaN(terms) || terms <= 0) {
   errors.terms = 'Terms must be a valid number greater than 0.';
 }
 
-if (isNaN(inputs.creditScore) || inputs.creditScore < 0 || inputs.creditScore > 999) {
+if (
+  inputs.creditScore === "" ||
+  isNaN(inputs.creditScore) ||
+  inputs.creditScore < 0 ||
+  inputs.creditScore > 999
+) {
   errors.creditScore = 'Credit Score must be a number between 0 and 999.';
 }
 
@@ -278,55 +291,89 @@ setInputErrors({});  // Clear any previous errors
   };
 
   const exportPDF = () => {
-    setLoadingPdf(true);
-    try {
-      const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text('SmartRent Auto™ - Calculation Summary', 14, 15);
-      autoTable(doc, {
-        startY: 25,
-        head: [['Field', 'Value']],
-        body: [
-          ['Client Name', inputs.clientName],
-          ['Vehicle Price', `R${inputs.vehiclePrice}`],
-          ['Retail Value', `R${inputs.mmValue}`],
-          ['Suburb', inputs.suburb],
-          ['Town', selectedSuburbInfo?.MP_NAME || ''],
-          ['Municipality', selectedSuburbInfo?.DC_NAME || ''],
-          ['Province', selectedSuburbInfo?.Province || ''],
-          ['Distance (km)', selectedSuburbInfo?.DIST_KM || ''],
-          ['Risk Profile', inputs.riskProfile],
-          ['Loading', `R${results.loading.toLocaleString()}`],
-          ['Risk Factor', `R${results.riskFactor.toLocaleString()}`],
-          ['Total Rental Amount', `R${results.totalRentalAmount.toLocaleString()}`],
-          ['Repo Cost', `R${results.repoCost.toLocaleString()}`],
-          
-          ['Manual Deposit', inputs.manualDeposit ? `R${inputs.manualDeposit}` : ''],
-          ['Net Rental Amount', `R${results.netRentalAmount.toLocaleString()}`],
-          ['License & Registration', `R2500`],
-          ['Document Fees', `R1500`],
-          ['Upfront Cost', `R${results.upfrontCost.toLocaleString()}`],
-          ['Terms (months)', inputs.termsInMonths],
-          
-          ['Monthly Installment', `R${results.monthlyInstallment.toFixed(2)}`]
-        ],
-      });
-      doc.save('SmartRentAuto_Calculation.pdf');
-      toast.success('PDF exported successfully!');
-    } catch (err) {
-      toast.error('Failed to export PDF.');
-    } finally {
-      setLoadingPdf(false);
-    }
-  };
+  setLoadingPdf(true);
+  try {
+    const doc = new jsPDF();
+
+    // 🟥 Add watermark using manual rotation
+    doc.setTextColor(255, 0, 0);
+    doc.setFontSize(80);
+    doc.setFont("helvetica", "bold");
+    doc.text("DEMO", 35, 150, { angle: 45 });
+
+    // Reset styles
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('SmartRent Auto™ - Calculation Summary (DEMO)', 14, 15);
+
+    const tableBody = [
+      ['DEMO Version', 'This is a DEMO version.'],
+      ['Client Name', inputs.clientName],     
+      ['Vehicle Price', `R${inputs.vehiclePrice}`],
+      ['Retail Value', `R${inputs.mmValue}`],
+      ['DEMO Version', 'This is a DEMO version.'],
+      ['Suburb', inputs.suburb],
+      ['Town', selectedSuburbInfo?.MP_NAME || ''],
+      ['Municipality', selectedSuburbInfo?.DC_NAME || ''],
+      ['DEMO Version', 'This is a DEMO version.'],
+      ['Province', selectedSuburbInfo?.Province || ''],
+      ['Distance (km)', selectedSuburbInfo?.DIST_KM || ''],
+      ['DEMO Version', 'This is a DEMO version.'],
+      ['Risk Profile', inputs.riskProfile],
+      ['Loading', `R${results.loading.toLocaleString()}`],
+      ['Risk Factor', `R${results.riskFactor.toLocaleString()}`],
+      ['DEMO Version', 'This is a DEMO version.'],
+      ['Total Rental Amount', `R${results.totalRentalAmount.toLocaleString()}`],
+      ['Repo Cost', `R${results.repoCost.toLocaleString()}`],
+      ['Manual Deposit', inputs.manualDeposit ? `R${inputs.manualDeposit}` : ''],
+      ['DEMO Version', 'This is a DEMO version.'],
+      ['Net Rental Amount', `R${results.netRentalAmount.toLocaleString()}`],
+      ['License & Registration', `R2500`],
+      ['Document Fees', `R1500`],
+      ['DEMO Version', 'This is a DEMO version.'],
+      ['Upfront Cost', `R${results.upfrontCost.toLocaleString()}`],
+      ['Terms (months)', inputs.termsInMonths],
+      ['Monthly Installment', `R${results.monthlyInstallment.toFixed(2)}`],
+      ['DEMO Version', 'This is a DEMO version.']
+    ];
+
+    autoTable(doc, {
+      startY: 25,
+      head: [['Field', 'Value']],
+      body: tableBody,
+      didParseCell: function (data) {
+        if (data.cell.raw === 'This is a DEMO version.') {
+          data.cell.styles.fontStyle = 'bold';
+          data.cell.styles.fontSize = 12;
+          data.cell.styles.textColor = [255, 0, 0]; // Red text
+        }
+      }
+    });
+
+    doc.save('SmartRentAuto_Calculation_DEMO.pdf');
+    toast.success('PDF exported with DEMO watermark!');
+  } catch (err) {
+    toast.error('Failed to export PDF.');
+  } finally {
+    setLoadingPdf(false);
+  }
+};
 
   return (
     <div className="p-4 max-w-xl mx-auto">
       <Toaster />
-      <div className="flex items-center mb-6 bg-white p-2 rounded shadow">
-        <img src="/smart logo.jpg" alt="SmartRent Auto Logo" className="h-10 w-auto mr-3" />
-        <h1 className="text-2xl font-bold text-gray-800">SmartRent Auto™ Calculator</h1>
+      <div className="fixed top-10 left-1/2 transform -translate-x-1/2 opacity-10 text-6xl font-extrabold text-red-600 pointer-events-none z-0">
+        DEMO
       </div>
+      <div className="bg-yellow-200 border border-yellow-400 text-yellow-900 px-4 py-2 rounded mb-4 text-center font-semibold">
+        DEMO VERSION – For demonstration purposes only. Not for production use. Formulas are not set to calculate correctly
+      </div>
+      <div className="flex items-center mb-6 bg-white p-2 rounded shadow">
+        <img src="/smart logo.jpg" alt="SmartRent Auto Logo Left" className="h-16" />
+        <h1 className="text-2xl font-bold text-center flex-1">SmartRent Auto™ Calculator</h1>
+        <img src="/smart logo.jpg" alt="SmartRent Auto Logo Right" className="h-16" />
+      </div>
+
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Client Name
@@ -378,7 +425,16 @@ setInputErrors({});  // Clear any previous errors
          />
         </div>
        </div>
-
+      <div className="mb-3">
+    <label className="block text-sm font-medium text-gray-700">Manual Deposit</label>
+    <input
+      type="number"
+      name="manualDeposit"
+      placeholder="Enter manual deposit if needed"
+      value={inputs.manualDeposit}
+      onChange={handleChange}
+      className="w-full p-2 border rounded mt-1"
+    />
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Suburb name
@@ -427,62 +483,53 @@ setInputErrors({});  // Clear any previous errors
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Credit Score
         </label>
-        <input
-          type="number"
-          className="w-full p-2 border border-gray-300 rounded"
-          value={creditScore}
-          onChange={(e) => setCreditScore(e.target.value)}
-          placeholder="e.g. 650"
-          min="0"
-          max="999"
-        />
+      <input
+        type="number"
+        name="creditScore"
+        className="w-full p-2 border border-gray-300 rounded"
+        value={inputs.creditScore}
+        onChange={handleChange}
+        placeholder="e.g. 650"
+        min="0"
+        max="999"
+      />
       </div>
 
-      <div className="mb-3">
-        <label className="block text-sm font-medium text-gray-700">Terms in months</label>
-        <input
-          type="number"
-          name="termsInMonths"
-          placeholder="Enter terms in months"
-          value={inputs.termsInMonths}
-          onChange={handleChange}
-          className="w-full p-2 border rounded mt-1"
-        />
-      </div>
-      <button
-        onClick={calculate}
-        className="w-full bg-blue-600 text-white py-2 rounded mb-4 hover:bg-blue-700"
-        disabled={loadingCalc}
-      >
-        {loadingCalc ? 'Calculating...' : 'Calculate'}
-      </button>
-<button
-  onClick={resetCalculator}
-  className="w-full bg-gray-600 text-white py-2 rounded mb-4 hover:bg-gray-700"
-  disabled={loadingCalc}
->
-  Reset
-</button>
-      <div className="bg-gray-100 p-4 rounded mb-6">
-        <h2 className="font-semibold mb-2">Results</h2>
-        <p>Deposit: <strong>R{results.deposit.toLocaleString()}</strong></p>
-        <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700">Manual Deposit</label>
-          <input
-            type="number"
-            name="manualDeposit"
-            placeholder="Enter manual deposit"
-            value={inputs.manualDeposit}
-            onChange={handleChange}
-            className="w-full p-2 border rounded mt-1"
-          />
-        </div>
-        <p>Repo Cost: <strong>R{results.repoCost.toLocaleString()}</strong></p>
-        <p>Net Rental Amount: <strong>R{results.netRentalAmount.toLocaleString()}</strong></p>
-        <p>Upfront Cost: <strong>R{results.upfrontCost.toLocaleString()}</strong></p>
-        
-        <p>Monthly Installment: <strong>R{results.monthlyInstallment.toFixed(2)}</strong></p>
-      </div>
+
+  <div className="mb-3">
+    <label className="block text-sm font-medium text-gray-700">Terms in months</label>
+    <input
+      type="number"
+      name="termsInMonths"
+      placeholder="Enter terms in months"
+      value={inputs.termsInMonths}
+      onChange={handleChange}
+      className="w-full p-2 border rounded mt-1"
+    />
+  </div>
+  <button
+    onClick={calculate}
+    className="w-full bg-blue-600 text-white py-2 rounded mb-4 hover:bg-blue-700"
+    disabled={loadingCalc}
+  >
+    {loadingCalc ? 'Calculating...' : 'Calculate'}
+  </button>
+  <button
+    onClick={resetCalculator}
+    className="w-full bg-gray-600 text-white py-2 rounded mb-4 hover:bg-gray-700"
+    disabled={loadingCalc}
+  >
+    Reset
+  </button>
+  <div className="bg-gray-100 p-4 rounded mb-6">
+  <h2 className="font-semibold mb-2">Results</h2>
+  <p>Deposit: <strong>R{results.deposit.toLocaleString()}</strong></p>
+  <p>Repo Cost: <strong>R{results.repoCost.toLocaleString()}</strong></p>
+  <p>Net Rental Amount: <strong>R{results.netRentalAmount.toLocaleString()}</strong></p>
+  <p>Upfront Cost: <strong>R{results.upfrontCost.toLocaleString()}</strong></p>
+  <p>Monthly Installment: <strong>R{results.monthlyInstallment.toFixed(2)}</strong></p>
+    </div>
+  </div>
 
       <button
         onClick={exportPDF}
